@@ -1,0 +1,79 @@
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+.env
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.pid
+server_pid.txt
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.tox/
+.hypothesis/
+
+# Distribution
+dist/
+build/
+*.egg-info/
+eggs/
+.eggs/
+wheels/
+sdist/
+var/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+.cache/
+
+# Project cleanup files
+fix_*.py
+test_*.py
+quick_*.ps1
+*.ps1
+QUICKSTART.md
+
+# ML Models cache
+~/.cache/huggingface/
+~/.cache/torch/
