@@ -28,6 +28,14 @@ class SyllableInfo(BaseModel):
     position: int
 
 
+class IdentificationStep(BaseModel):
+    """A step in the chandas identification process"""
+    step_number: int = Field(..., description="Step sequence number")
+    step_name: str = Field(..., description="Name of this step")
+    description: str = Field(..., description="What happens in this step")
+    result: str = Field(..., description="Result of this step")
+
+
 class ChandasIdentifyResponse(BaseModel):
     """Response model for chandas identification"""
     chandas_name: str = Field(..., description="Identified meter name")
@@ -35,6 +43,7 @@ class ChandasIdentifyResponse(BaseModel):
     laghu_guru_pattern: str = Field(..., description="Pattern representation (L/G or |/S)")
     explanation: str = Field(..., description="Detailed explanation of the meter")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score")
+    identification_process: List[IdentificationStep] = Field(default_factory=list, description="Step-by-step mathematical process of how chandas was identified")
     
     class Config:
         json_schema_extra = {
@@ -46,7 +55,39 @@ class ChandasIdentifyResponse(BaseModel):
                 ],
                 "laghu_guru_pattern": "LGGLGGLG",
                 "explanation": "This is Anushtup meter with 8 syllables per quarter",
-                "confidence": 0.95
+                "confidence": 0.95,
+                "identification_process": [
+                    {
+                        "step_number": 1,
+                        "step_name": "Text Preprocessing",
+                        "description": "Remove punctuation and normalize text",
+                        "result": "Cleaned text ready for syllable extraction"
+                    },
+                    {
+                        "step_number": 2,
+                        "step_name": "Syllable Segmentation",
+                        "description": "Split text into syllables using Devanagari script rules",
+                        "result": "32 syllables detected"
+                    },
+                    {
+                        "step_number": 3,
+                        "step_name": "Laghu-Guru Classification",
+                        "description": "Classify each syllable as Laghu (short) or Guru (long) based on vowel length and conjunct consonants",
+                        "result": "Pattern: LGGLGGLG LGGLGGLG LGGLGGLG LGGLGGLG"
+                    },
+                    {
+                        "step_number": 4,
+                        "step_name": "Pattern Matching",
+                        "description": "Match against known chandas patterns in database",
+                        "result": "Matched: Anushtup (32 syllables, 8 per quarter)"
+                    },
+                    {
+                        "step_number": 5,
+                        "step_name": "Confidence Calculation",
+                        "description": "Calculate confidence based on pattern match quality",
+                        "result": "Confidence: 0.95 (Exact match)"
+                    }
+                ]
             }
         }
 
@@ -311,27 +352,144 @@ class OperationResponse(BaseModel):
 
 # ==================== VOICE ANALYZER MODELS ====================
 
-class VoiceAnalyzeResponse(BaseModel):
-    """Response from voice karaoke analyzer"""
-    transcribed: str = Field(..., description="Transcribed Sanskrit text")
-    accuracy: float = Field(..., ge=0.0, le=1.0, description="Pronunciation accuracy")
-    errors: List[Dict[str, str]] = Field(..., description="Identified errors")
-    suggestions: str = Field(..., description="Improvement suggestions")
+class VoiceAnalyzeRequest(BaseModel):
+    """Request for voice karaoke analysis"""
+    reference_shloka: Optional[str] = Field(None, description="Expected shloka (optional, will auto-detect if not provided)")
     
     class Config:
         json_schema_extra = {
             "example": {
-                "transcribed": "वसुदेव सुतं देवं",
-                "accuracy": 0.87,
+                "reference_shloka": "वसुदेवसुतं देवं कंसचाणूरमर्दनम्"
+            }
+        }
+
+
+class PronunciationError(BaseModel):
+    """A pronunciation error detail"""
+    position: int = Field(..., description="Position in verse (word index)")
+    expected: str = Field(..., description="Expected pronunciation")
+    actual: str = Field(..., description="Actual pronunciation")
+    error_type: str = Field(..., description="Type of error: syllable_mismatch, word_wrong, meter_deviation")
+    severity: str = Field(..., description="Error severity: minor, moderate, major")
+    note: str = Field(..., description="Detailed explanation")
+
+
+class AccuracyMetrics(BaseModel):
+    """Detailed accuracy metrics"""
+    overall_accuracy: float = Field(..., ge=0.0, le=1.0, description="Overall accuracy score")
+    word_accuracy: float = Field(..., ge=0.0, le=1.0, description="Word-level accuracy")
+    syllable_accuracy: float = Field(..., ge=0.0, le=1.0, description="Syllable-level accuracy")
+    meter_accuracy: float = Field(..., ge=0.0, le=1.0, description="Meter pattern accuracy")
+    pronunciation_clarity: float = Field(..., ge=0.0, le=1.0, description="Overall pronunciation clarity")
+
+
+class IdentifiedShloka(BaseModel):
+    """Information about the identified shloka"""
+    text: str = Field(..., description="Complete shloka text")
+    source: str = Field(..., description="Source text (e.g., Bhagavad Gita 2.47)")
+    meter: str = Field(..., description="Meter name")
+    meaning: str = Field(..., description="English translation")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Matching confidence")
+    page_number: Optional[int] = Field(None, description="Page number in source PDF (if available)")
+    source_file: Optional[str] = Field(None, description="Source PDF filename (if from uploaded document)")
+    chunk_id: Optional[int] = Field(None, description="Chunk ID in RAG database")
+
+
+class VoiceAnalyzeResponse(BaseModel):
+    """Response from voice karaoke analyzer"""
+    transcribed_text: str = Field(..., description="Transcribed Sanskrit text from audio")
+    identified_shloka: Optional[IdentifiedShloka] = Field(None, description="Identified shloka details")
+    accuracy_metrics: AccuracyMetrics = Field(..., description="Detailed accuracy metrics")
+    errors: List[PronunciationError] = Field(default_factory=list, description="Identified pronunciation errors")
+    suggestions: str = Field(..., description="Personalized improvement suggestions")
+    overall_feedback: str = Field(..., description="Overall performance feedback")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "transcribed_text": "वसुदेव सुतं देवं कंसचाणूरमर्दनम्",
+                "identified_shloka": {
+                    "text": "वसुदेवसुतं देवं कंसचाणूरमर्दनम्।\nदेवकीपरमानन्दं कृष्णं वन्दे जगद्गुरुम्॥",
+                    "source": "Krishna Stotram",
+                    "meter": "Anushtup",
+                    "meaning": "I bow to Krishna, son of Vasudeva, destroyer of Kamsa and Chanura, supreme joy of Devaki, teacher of the world.",
+                    "confidence": 0.92
+                },
+                "accuracy_metrics": {
+                    "overall_accuracy": 0.87,
+                    "word_accuracy": 0.90,
+                    "syllable_accuracy": 0.85,
+                    "meter_accuracy": 0.88,
+                    "pronunciation_clarity": 0.84
+                },
                 "errors": [
                     {
-                        "position": "2",
-                        "expected": "वसुदेव",
-                        "actual": "वसुदेव",
-                        "note": "Slight mispronunciation of 'dev' sound"
+                        "position": 1,
+                        "expected": "वसुदेवसुतं",
+                        "actual": "वसुदेव सुतं",
+                        "error_type": "syllable_mismatch",
+                        "severity": "minor",
+                        "note": "Added extra space between compound words"
                     }
                 ],
-                "suggestions": "Focus on clear pronunciation of dental consonants"
+                "suggestions": "Focus on connecting compound words smoothly. Practice the 'dev' sound with proper dental pronunciation.",
+                "overall_feedback": "Good attempt! Your pronunciation is 87% accurate. Main areas for improvement: compound word joining and dental consonant clarity."
+            }
+        }
+
+
+# ==================== CHATBOT MODELS ====================
+
+class InputTypeEnum(str, Enum):
+    """Input type for chatbot"""
+    text = "text"
+    voice = "voice"
+    image = "image"
+
+
+class ChatMessage(BaseModel):
+    """A single chat message"""
+    role: str = Field(..., description="Message role: user or assistant")
+    content: str = Field(..., description="Message content")
+    timestamp: Optional[float] = Field(None, description="Unix timestamp")
+
+
+class ChatRequest(BaseModel):
+    """Request model for chatbot"""
+    message: Optional[str] = Field(None, description="Text message (required if input_type=text)")
+    input_type: InputTypeEnum = Field(InputTypeEnum.text, description="Type of input")
+    conversation_history: List[ChatMessage] = Field(default_factory=list, description="Previous conversation context")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "message": "What is Anushtup meter?",
+                "input_type": "text",
+                "conversation_history": []
+            }
+        }
+
+
+class ChatResponse(BaseModel):
+    """Response model from chatbot"""
+    response: str = Field(..., description="Chatbot response text")
+    input_detected: str = Field(..., description="Detected/transcribed input from user")
+    sources: List[str] = Field(default_factory=list, description="Knowledge base sources used")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Response confidence")
+    suggestions: List[str] = Field(default_factory=list, description="Follow-up question suggestions")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "response": "Anushtup is the most common Sanskrit meter, consisting of 32 syllables divided into 4 quarters of 8 syllables each. It's widely used in epics like Mahabharata and Ramayana.",
+                "input_detected": "What is Anushtup meter?",
+                "sources": ["Chandas Knowledge Base", "Example Shlokas"],
+                "confidence": 0.95,
+                "suggestions": [
+                    "How do I identify Anushtup meter?",
+                    "What are other common Sanskrit meters?",
+                    "Can you show me an example of Anushtup?"
+                ]
             }
         }
 

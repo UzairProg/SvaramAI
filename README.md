@@ -27,22 +27,22 @@
 
 ## 🌟 Overview
 
-SvaramAI is a comprehensive AI-powered backend system for Sanskrit language processing. It combines modern AI/ML technologies (Groq, local embeddings, Qdrant vector database) with traditional Sanskrit scholarship to provide:
+SvaramAI is a comprehensive AI-powered backend system for Sanskrit language processing. It combines modern AI/ML technologies (OpenAI GPT-4o, Whisper, local embeddings, Qdrant vector database) with traditional Sanskrit scholarship to provide:
 
-- **Chandas Identification**: Analyze prosody and identify Sanskrit meters with Groq LLM + algorithmic fallback
-- **Shloka Generation**: Create authentic Sanskrit verses using Groq AI
+- **Chandas Identification**: Analyze prosody and identify Sanskrit meters with OpenAI GPT-4o + algorithmic fallback
+- **Shloka Generation**: Create authentic Sanskrit verses using OpenAI GPT-4o
 - **Branding Taglines**: Generate Sanskrit taglines for modern businesses
 - **Meaning Extraction**: Translate and analyze Sanskrit texts
 - **Knowledge Base**: RAG-powered semantic search with Qdrant and local embeddings
 - **PDF Upload**: Extract, chunk, and embed Sanskrit PDFs for semantic search
-- **Voice Analysis**: (Future) Pronunciation accuracy assessment
+- **Voice Karaoke**: Pronunciation analysis with OpenAI Whisper + GPT-4o feedback
 
 ---
 
 ## ✨ Features
 
 ### 🔍 1. Chandas Identifier - Prosody AI Engine
-- **Groq LLM Integration** with llama-3.3-70b-versatile
+- **OpenAI GPT-4o Integration** for intelligent meter detection
 - Syllable-by-syllable breakdown with Laghu/Guru classification
 - Meter identification with confidence scores
 - **Algorithmic Fallback** when LLM unavailable
@@ -81,11 +81,15 @@ SvaramAI is a comprehensive AI-powered backend system for Sanskrit language proc
 - Context retrieval for AI modules
 - Auto-recreation of collections on vector dimension mismatch
 
-### 🎤 6. Voice Karaoke Analyzer (Future)
-- Speech-to-text for Sanskrit
-- Pronunciation accuracy scoring
-- Error detection and suggestions
-- Real-time feedback
+### 🎤 6. Voice Karaoke Analyzer - Pronunciation Coach
+- **OpenAI Whisper** speech-to-text for Sanskrit audio
+- Automatic shloka identification using RAG semantic search
+- Detailed pronunciation accuracy scoring (overall, word-level, syllable-level, meter accuracy)
+- **GPT-4o powered feedback** with specific error identification
+- Error classification: syllable mismatch, word wrong, meter deviation
+- Personalized improvement suggestions
+- Supports: WAV, MP3, M4A, FLAC, OGG formats
+- Real-time error detection and corrections
 
 ---
 
@@ -164,8 +168,8 @@ backend/
 
 - **Python 3.11+** (Tested on Python 3.12.1)
 - **Qdrant** (Vector database for RAG)
-- **Groq API Key** (Primary LLM provider)
-- **Optional**: OpenAI or Anthropic API keys for additional LLM providers
+- **OpenAI API Key** (Primary LLM provider - GPT-4o + Whisper)
+- **Optional**: Groq, Anthropic, or Gemini API keys for additional LLM providers
 
 ### Step 1: Clone Repository
 
@@ -216,14 +220,14 @@ API_PORT=8000
 DEBUG=True
 
 # API Keys
-GROQ_API_KEY=gsk_your-groq-key-here
-OPENAI_API_KEY=sk-your-openai-key-here  # Optional
+OPENAI_API_KEY=sk-your-openai-key-here
+GROQ_API_KEY=gsk_your-groq-key-here  # Optional
 ANTHROPIC_API_KEY=sk-ant-your-anthropic-key-here  # Optional
 
 # LLM Configuration
-DEFAULT_LLM_PROVIDER=groq
+DEFAULT_LLM_PROVIDER=openai
+OPENAI_MODEL=gpt-4o
 GROQ_MODEL=llama-3.3-70b-versatile
-OPENAI_MODEL=gpt-4-turbo-preview
 ANTHROPIC_MODEL=claude-3-opus-20240229
 LLM_TEMPERATURE=0.7
 LLM_MAX_TOKENS=2000
@@ -247,8 +251,8 @@ VECTOR_SIZE=384
 
 ### Required API Keys
 
-- **Groq**: Get from https://console.groq.com/keys (Primary LLM provider)
-- **OpenAI** (Optional): Get from https://platform.openai.com/api-keys
+- **OpenAI**: Get from https://platform.openai.com/api-keys (Required for GPT-4o and Whisper)
+- **Groq** (Optional): Get from https://console.groq.com/keys
 - **Anthropic** (Optional): Get from https://console.anthropic.com/
 
 ---
@@ -305,6 +309,10 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 - `PUT /api/v1/kb/document` - Update existing document
 - `DELETE /api/v1/kb/document` - Delete document by ID
 - `GET /api/v1/kb/collection/{collection}/stats` - Get collection statistics
+
+### Voice Karaoke
+- `POST /api/v1/voice/analyze` - Analyze Sanskrit pronunciation from audio
+- `GET /api/v1/voice/supported-formats` - Get supported audio formats
 
 ---
 
@@ -464,6 +472,80 @@ Invoke-RestMethod -Uri "http://localhost:8000/api/v1/kb/search" `
 }
 ```
 
+### 8. Voice Karaoke - Analyze Pronunciation
+
+```powershell
+# Upload audio file for pronunciation analysis
+$audioPath = "C:\path\to\recording.wav"
+
+# With reference shloka
+$form = @{
+    audio = Get-Item -Path $audioPath
+    reference_shloka = "वसुदेवसुतं देवं कंसचाणूरमर्दनम्"
+}
+
+$response = Invoke-RestMethod -Uri "http://localhost:8000/api/v1/voice/analyze" `
+    -Method Post `
+    -Form $form
+
+# Display results
+Write-Host "Transcribed: $($response.transcribed_text)"
+Write-Host "Overall Accuracy: $($response.accuracy_metrics.overall_accuracy * 100)%"
+Write-Host "Suggestions: $($response.suggestions)"
+```
+
+**Response:**
+```json
+{
+  "transcribed_text": "वसुदेव सुतं देवं कंसचाणूरमर्दनम्",
+  "identified_shloka": {
+    "text": "वसुदेवसुतं देवं कंसचाणूरमर्दनम्।\nदेवकीपरमानन्दं कृष्णं वन्दे जगद्गुरुम्॥",
+    "source": "Krishna Stotram",
+    "meter": "Anushtup",
+    "meaning": "I bow to Krishna, son of Vasudeva...",
+    "confidence": 0.92
+  },
+  "accuracy_metrics": {
+    "overall_accuracy": 0.87,
+    "word_accuracy": 0.90,
+    "syllable_accuracy": 0.85,
+    "meter_accuracy": 0.88,
+    "pronunciation_clarity": 0.84
+  },
+  "errors": [
+    {
+      "position": 1,
+      "expected": "वसुदेवसुतं",
+      "actual": "वसुदेव सुतं",
+      "error_type": "syllable_mismatch",
+      "severity": "minor",
+      "note": "Added extra space between compound words"
+    }
+  ],
+  "suggestions": "Focus on connecting compound words smoothly. Practice the 'dev' sound with proper dental pronunciation.",
+  "overall_feedback": "Good attempt! Your pronunciation is 87% accurate. Main areas for improvement: compound word joining and dental consonant clarity."
+}
+```
+
+### 9. Auto-Detect Shloka (Without Reference)
+
+```powershell
+# Let AI identify which shloka you're reciting
+$form = @{
+    audio = Get-Item -Path "C:\path\to\recording.wav"
+}
+
+Invoke-RestMethod -Uri "http://localhost:8000/api/v1/voice/analyze" `
+    -Method Post `
+    -Form $form
+```
+
+The system will:
+1. Transcribe your audio using Whisper
+2. Search knowledge base to identify the shloka
+3. Compare your pronunciation against the correct text
+4. Provide detailed feedback
+
 ---
 
 ## 🛠️ Development
@@ -579,7 +661,7 @@ This project is licensed under the MIT License.
 ## 🙏 Acknowledgments
 
 - **FastAPI**: Modern async web framework
-- **Groq**: Fast LLM inference with llama-3.3-70b-versatile
+- **OpenAI**: GPT-4o LLM and Whisper speech-to-text
 - **Qdrant**: High-performance vector database
 - **sentence-transformers**: Local multilingual embeddings
 - **Sanskrit Scholars**: Traditional knowledge preservation
@@ -589,7 +671,8 @@ This project is licensed under the MIT License.
 ## 🔧 Technical Stack
 
 - **Backend**: FastAPI 0.109+ with Uvicorn
-- **LLM**: Groq (llama-3.3-70b-versatile) with fallback to OpenAI/Anthropic
+- **LLM**: OpenAI GPT-4o (primary) with fallback to Groq/Anthropic/Gemini
+- **Speech-to-Text**: OpenAI Whisper API for Sanskrit audio transcription
 - **Embeddings**: sentence-transformers (paraphrase-multilingual-MiniLM-L12-v2) - 384-dim vectors
 - **Vector DB**: Qdrant 1.7.3+ on localhost:6333
 - **PDF Processing**: PyPDF2 with chunking strategy

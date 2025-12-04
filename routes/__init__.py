@@ -5,7 +5,9 @@ from . import (
     shloka_routes,
     tagline_routes,
     meaning_routes,
-    knowledgebase_routes
+    knowledgebase_routes,
+    voice_routes,
+    chatbot_routes
 )
 
 __all__ = [
@@ -13,5 +15,7 @@ __all__ = [
     'shloka_routes',
     'tagline_routes',
     'meaning_routes',
-    'knowledgebase_routes'
+    'knowledgebase_routes',
+    'voice_routes',
+    'chatbot_routes'
 ]

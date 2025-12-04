@@ -26,8 +26,8 @@ class Settings(BaseSettings):
     jwt_secret: str = "dev_jwt_secret"
     
     # LLM Configuration
-    default_llm_provider: str = "gemini"
-    openai_model: str = "gpt-4-turbo-preview"
+    default_llm_provider: str = "openai"
+    openai_model: str = "gpt-4o"
     anthropic_model: str = "claude-3-opus-20240229"
     gemini_model: str = "gemini-1.5-pro"
     groq_model: str = "llama-3.3-70b-versatile"

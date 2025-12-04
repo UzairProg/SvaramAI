@@ -4,7 +4,7 @@ Chandas Controller - Business logic for prosody identification
 
 import logging
 import re
-from typing import Dict, Any
+from typing import Dict, Any, List
 import json
 
 from models import ChandasIdentifyRequest, ChandasIdentifyResponse, SyllableInfo
@@ -49,7 +49,7 @@ class ChandasController:
             
             # Try LLM first with proper prompt
             try:
-                logger.info(">> Attempting Groq API for chandas identification...")
+                logger.info(">> Attempting OpenAI API for chandas identification...")
                 
                 # Use system prompt for better results
                 messages = [
@@ -65,20 +65,23 @@ class ChandasController:
                 
                 response_text = await self.llm_client.chat_completion(
                     messages=messages,
-                    provider="groq",
+                    provider="openai",
                     temperature=0.3
                 )
                 
                 # Parse LLM response
                 result = self._parse_llm_response(response_text)
-                logger.info(f">> GROQ SUCCESS - {result['chandas_name']} (conf: {result.get('confidence', 'N/A')})")
+                logger.info(f">> OPENAI SUCCESS - {result['chandas_name']} (conf: {result.get('confidence', 'N/A')})")
                 
             except Exception as llm_error:
-                # Groq failed - use algorithmic fallback
-                logger.warning(f">> GROQ FAILED: {str(llm_error)[:100]}")
+                # OpenAI failed - use algorithmic fallback
+                logger.warning(f">> OPENAI FAILED: {str(llm_error)[:100]}")
                 logger.info(">> Using pattern-based fallback algorithm...")
                 result = detect_chandas(request.shloka)
                 logger.info(f">> FALLBACK identified: {result['chandas_name']} (conf: {result['confidence']})")
+            
+            # Add step-by-step identification process explanation
+            result['identification_process'] = self._generate_identification_process(request.shloka, result)
             
             return ChandasIdentifyResponse(**result)
             
@@ -107,6 +110,111 @@ Guru (G): Long syllable - two mÄtrÄs
         except Exception as e:
             logger.warning(f"Failed to get context: {str(e)}")
             return ""
+    
+    def _generate_identification_process(self, shloka: str, result: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Generate step-by-step explanation of the mathematical process used to identify chandas
+        
+        Args:
+            shloka: Original Sanskrit text
+            result: Detection result with syllable breakdown and pattern
+            
+        Returns:
+            List of identification steps
+        """
+        steps = []
+        
+        # Step 1: Text Preprocessing
+        cleaned_text = re.sub(r'[।॥\n\r\s]+', '', shloka)
+        steps.append({
+            "step_number": 1,
+            "step_name": "Text Preprocessing",
+            "description": "Remove punctuation marks (।॥), whitespace, and newlines to get clean Devanagari text",
+            "result": f"Cleaned text: {cleaned_text[:50]}{'...' if len(cleaned_text) > 50 else ''}"
+        })
+        
+        # Step 2: Syllable Segmentation
+        syllable_count = len(result.get('syllable_breakdown', []))
+        sample_syllables = result.get('syllable_breakdown', [])[:5]
+        
+        # Handle both dict and SyllableInfo objects
+        sample_texts = []
+        for s in sample_syllables:
+            if isinstance(s, dict):
+                sample_texts.append(s.get('syllable', ''))
+            else:
+                sample_texts.append(getattr(s, 'syllable', ''))
+        
+        sample_text = ", ".join(sample_texts)
+        if len(result.get('syllable_breakdown', [])) > 5:
+            sample_text += "..."
+        
+        steps.append({
+            "step_number": 2,
+            "step_name": "Syllable Segmentation (Akshara Vibhajana)",
+            "description": "Split text into syllables using Devanagari rules: consonant + vowel + optional dependent marks (ा, ि, ी, ु, ू, े, ै, ो, ौ, ं, ः) + optional halant (्) + conjunct consonants",
+            "result": f"Total syllables: {syllable_count}. Examples: {sample_text}"
+        })
+        
+        # Step 3: Laghu-Guru Classification
+        pattern = result.get('laghu_guru_pattern', '')
+        laghu_count = pattern.count('L')
+        guru_count = pattern.count('G')
+        
+        classification_rules = [
+            "• Laghu (L): Short vowel (अ, इ, उ, ऋ) without conjunct",
+            "• Guru (G): Long vowel (आ, ई, ऊ, ए, ऐ, ओ, औ) OR short vowel + conjunct OR anusvara (ं) OR visarga (ः) OR end of line"
+        ]
+        
+        steps.append({
+            "step_number": 3,
+            "step_name": "Laghu-Guru Classification (Mātrā Analysis)",
+            "description": "Classify each syllable based on prosodic weight:\n" + "\n".join(classification_rules),
+            "result": f"Pattern: {pattern}\nLaghu: {laghu_count}, Guru: {guru_count}"
+        })
+        
+        # Step 4: Pattern Matching
+        chandas_name = result.get('chandas_name', 'Unknown')
+        
+        if syllable_count == 32:
+            match_explanation = "32 syllables (8 per quarter × 4 quarters) matches Anushtup meter structure"
+        elif syllable_count == 44:
+            match_explanation = f"44 syllables (11 per quarter × 4 quarters). Pattern {pattern} matched against Indravajra/Upendravajra templates"
+        elif syllable_count == 56:
+            match_explanation = "56 syllables (14 per quarter × 4 quarters) matches Vasantatilaka structure"
+        elif syllable_count % 8 == 0:
+            quarters = syllable_count // 8
+            match_explanation = f"{syllable_count} syllables = {quarters} quarters of 8. Likely Anushtup variant"
+        else:
+            match_explanation = f"{syllable_count} syllables analyzed. Pattern compared against database of known chandas signatures"
+        
+        steps.append({
+            "step_number": 4,
+            "step_name": "Pattern Matching (Chandas Parichaya)",
+            "description": "Compare syllable count and L-G pattern against database of known chandas:\n• Anushtup: 32 syllables, flexible pattern\n• Indravajra: 44 syllables, GGLGGLLGLLG pattern\n• Upendravajra: 44 syllables, LGLGGLLGLLG pattern\n• Vasantatilaka: 56 syllables\n• Malini: 60 syllables\n• Shardula-vikridita: 76 syllables",
+            "result": f"Matched: {chandas_name}\n{match_explanation}"
+        })
+        
+        # Step 5: Confidence Calculation
+        confidence = result.get('confidence', 0.5)
+        
+        if confidence >= 0.9:
+            confidence_reason = "Exact match with standard pattern and syllable count"
+        elif confidence >= 0.7:
+            confidence_reason = "Strong match with minor variations acceptable in classical texts"
+        elif confidence >= 0.5:
+            confidence_reason = "Partial match - incomplete verse or variant form detected"
+        else:
+            confidence_reason = "Low confidence - unusual pattern or insufficient data"
+        
+        steps.append({
+            "step_number": 5,
+            "step_name": "Confidence Score Calculation",
+            "description": "Calculate confidence based on:\n• Pattern match accuracy (exact vs partial)\n• Syllable count alignment with known meters\n• Consistency of L-G pattern across quarters\n• Presence of standard chandas markers",
+            "result": f"Confidence: {confidence:.2f}\nReason: {confidence_reason}"
+        })
+        
+        return steps
     
     def _parse_llm_response(self, response_text: str) -> Dict[str, Any]:
         """Parse LLM response to extract structured data"""

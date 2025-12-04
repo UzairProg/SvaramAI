@@ -16,7 +16,9 @@ from routes import (
     shloka_routes,
     tagline_routes,
     meaning_routes,
-    knowledgebase_routes
+    knowledgebase_routes,
+    voice_routes,
+    chatbot_routes
 )
 
 
@@ -81,12 +83,25 @@ async def log_requests(request: Request, call_next):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Handle validation errors"""
-    logger.error(f"Validation error: {exc.errors()}")
+    errors = exc.errors()
+    
+    # Convert error details to JSON-serializable format
+    serializable_errors = []
+    for error in errors:
+        serializable_error = {
+            "loc": error.get("loc"),
+            "msg": error.get("msg"),
+            "type": error.get("type"),
+            "input": str(error.get("input")) if error.get("input") is not None else None
+        }
+        serializable_errors.append(serializable_error)
+    
+    logger.error(f"Validation error: {serializable_errors}")
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
             "error": "Validation Error",
-            "details": exc.errors(),
+            "details": serializable_errors,
             "message": "Invalid request parameters"
         }
     )
@@ -120,7 +135,8 @@ async def root():
             "tagline_generator",
             "meaning_engine",
             "knowledge_base",
-            "voice_analyzer"
+            "voice_analyzer",
+            "chatbot"
         ]
     }
 
@@ -145,6 +161,8 @@ app.include_router(shloka_routes.router, prefix="/api/v1", tags=["Shloka Generat
 app.include_router(tagline_routes.router, prefix="/api/v1", tags=["Tagline Generator"])
 app.include_router(meaning_routes.router, prefix="/api/v1", tags=["Meaning Engine"])
 app.include_router(knowledgebase_routes.router, prefix="/api/v1", tags=["Knowledge Base"])
+app.include_router(voice_routes.router)
+app.include_router(chatbot_routes.router, tags=["Chatbot"])
 
 
 if __name__ == "__main__":

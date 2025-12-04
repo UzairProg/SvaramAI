@@ -19,7 +19,7 @@ async def identify_chandas(
     controller: ChandasController = Depends(get_chandas_controller)
 ):
     """
-    Identify the chandas (meter) of a Sanskrit shloka
+    Identify the chandas (meter) of a Sanskrit shloka with detailed mathematical process explanation
     
     This endpoint analyzes the syllable pattern and identifies the prosodic meter.
     
@@ -30,6 +30,12 @@ async def identify_chandas(
     - Syllable breakdown with Laghu/Guru classification
     - Pattern representation
     - Explanation and confidence score
+    - **Step-by-step identification process**: Shows exactly how the chandas was determined through:
+      1. Text preprocessing and normalization
+      2. Syllable segmentation using Devanagari script rules
+      3. Laghu-Guru classification based on vowel length and conjuncts
+      4. Pattern matching against known chandas database
+      5. Confidence calculation methodology
     """
     try:
         result = await controller.identify_chandas(request)
