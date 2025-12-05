@@ -447,6 +447,12 @@ class InputTypeEnum(str, Enum):
     image = "image"
 
 
+class PersonaEnum(str, Enum):
+    """AI persona options"""
+    default = "default"
+    krishna = "krishna"
+
+
 class ChatMessage(BaseModel):
     """A single chat message"""
     role: str = Field(..., description="Message role: user or assistant")
@@ -458,6 +464,7 @@ class ChatRequest(BaseModel):
     """Request model for chatbot"""
     message: Optional[str] = Field(None, description="Text message (required if input_type=text)")
     input_type: InputTypeEnum = Field(InputTypeEnum.text, description="Type of input")
+    persona: PersonaEnum = Field(PersonaEnum.default, description="AI persona to use")
     conversation_history: List[ChatMessage] = Field(default_factory=list, description="Previous conversation context")
     
     class Config:
@@ -465,6 +472,7 @@ class ChatRequest(BaseModel):
             "example": {
                 "message": "What is Anushtup meter?",
                 "input_type": "text",
+                "persona": "default",
                 "conversation_history": []
             }
         }

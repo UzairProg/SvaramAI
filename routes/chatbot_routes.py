@@ -19,11 +19,12 @@ router = APIRouter()
 
 @router.post("/api/v1/chat", response_model=ChatResponse)
 async def chat(
-    message: Optional[str] = Form(None),
     input_type: str = Form("text"),
+    persona: str = Form("default"),
+    message: Optional[str] = Form(None),
     conversation_history: Optional[str] = Form(None),
-    audio: Union[UploadFile, str, None] = File(default=None),
-    image: Union[UploadFile, str, None] = File(default=None),
+    audio: Optional[UploadFile] = File(None),
+    image: Optional[UploadFile] = File(None),
     controller: ChatbotController = Depends(get_chatbot_controller)
 ):
     """
@@ -43,6 +44,9 @@ async def chat(
     - image: Image file containing Sanskrit text or question (jpg, png)
     - input_type: "image"
     
+    **AI Persona:**
+    - persona: "default" (Sanskrit AI assistant) or "krishna" (Lord Krishna persona)
+    
     **Optional:**
     - conversation_history: JSON array of previous messages for context
     
@@ -53,18 +57,18 @@ async def chat(
     - Meaning and translation
     - Sanskrit grammar and knowledge
     
+    **Krishna Persona**: When using "krishna" persona, interact with Lord Krishna who shares
+    wisdom from Bhagavad Gita, discusses dharma, karma, devotion, and eternal truths.
+    
     Returns intelligent responses with sources, confidence, and follow-up suggestions.
     """
     try:
-        # Handle empty string files (some clients send "" instead of null)
-        if isinstance(audio, str) and not audio:
-            audio = None
-        if isinstance(image, str) and not image:
-            image = None
+        # Debug logging
+        logger.info(f"🔍 Received - audio: {audio}, image: {image}, input_type: {input_type}")
         
-        # Convert to UploadFile or None
-        audio_file = audio if isinstance(audio, UploadFile) else None
-        image_file = image if isinstance(image, UploadFile) else None
+        # FastAPI returns UploadFile or None - use them directly
+        audio_file = audio
+        image_file = image
         
         # Validate input type
         if input_type not in ["text", "voice", "image"]:
@@ -95,17 +99,18 @@ async def chat(
         
         elif input_type == "voice":
             if not audio_file:
+                logger.error(f"Voice input requested but audio_file is None. Raw audio param type: {type(audio)}, value: {audio}")
                 raise HTTPException(
                     status_code=400,
-                    detail="Audio file is required for voice input"
+                    detail="Audio file is required for voice input. Please upload an audio file (wav, mp3, m4a, flac, ogg) in the 'audio' field."
                 )
             
             # Validate audio format
-            allowed_audio = {"audio/wav", "audio/mpeg", "audio/mp3", "audio/x-m4a", "audio/flac", "audio/ogg"}
+            allowed_audio = {"audio/wav", "audio/mpeg", "audio/mp3", "audio/x-m4a", "audio/flac", "audio/ogg", "audio/mp4"}
             if audio_file.content_type not in allowed_audio:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Unsupported audio format: {audio_file.content_type}"
+                    detail=f"Unsupported audio format: {audio_file.content_type}. Allowed: wav, mp3, m4a, flac, ogg"
                 )
             
             # Save audio temporarily
@@ -146,7 +151,8 @@ async def chat(
                 input_type=input_type,
                 audio_path=audio_path,
                 image_path=image_path,
-                conversation_history=history
+                conversation_history=history,
+                persona=persona
             )
             return result
         

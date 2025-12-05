@@ -23,6 +23,7 @@ class ChatbotController:
         self.llm_client = get_llm_client()
         self.rag_client = get_rag_client()
         self.system_prompt = self._load_system_prompt()
+        self.krishna_prompt = self._load_krishna_prompt()
     
     def _load_system_prompt(self) -> str:
         """Load chatbot system prompt"""
@@ -31,16 +32,16 @@ class ChatbotController:
                 return f.read()
         except FileNotFoundError:
             # Fallback system prompt
-            return """You are a Sanskrit AI assistant specialized in helping users with Sanskrit language processing. 
-You can help with:
-- Chandas (meter) identification and explanation
-- Shloka generation and analysis
-- Sanskrit pronunciation and meaning
-- Sanskrit grammar and prosody
-- Tagline generation in Sanskrit
-- Knowledge base queries about Sanskrit texts
-
-Keep responses focused on Sanskrit language topics. Be helpful, accurate, and educational."""
+            return """You are a Sanskrit AI assistant specialized in helping users with Sanskrit language processing."""
+    
+    def _load_krishna_prompt(self) -> str:
+        """Load Krishna persona prompt"""
+        try:
+            with open("prompts/krishna_persona.txt", 'r', encoding='utf-8') as f:
+                return f.read()
+        except FileNotFoundError:
+            # Fallback Krishna prompt
+            return """You are Lord Krishna, sharing divine wisdom and guidance with devotees."""
     
     async def process_chat(
         self, 
@@ -48,7 +49,8 @@ Keep responses focused on Sanskrit language topics. Be helpful, accurate, and ed
         input_type: str,
         audio_path: Optional[str] = None,
         image_path: Optional[str] = None,
-        conversation_history: List[ChatMessage] = None
+        conversation_history: List[ChatMessage] = None,
+        persona: str = "default"
     ) -> ChatResponse:
         """
         Process chatbot request with text, voice, or image input
@@ -94,7 +96,8 @@ Keep responses focused on Sanskrit language topics. Be helpful, accurate, and ed
             messages = self._build_conversation(
                 user_query=user_query,
                 rag_context=rag_context,
-                conversation_history=conversation_history or []
+                conversation_history=conversation_history or [],
+                persona=persona
             )
             
             # Step 4: Get LLM response
@@ -274,21 +277,32 @@ Keep responses focused on Sanskrit language topics. Be helpful, accurate, and ed
         self,
         user_query: str,
         rag_context: List[Dict[str, Any]],
-        conversation_history: List[ChatMessage]
+        conversation_history: List[ChatMessage],
+        persona: str = "default"
     ) -> List[Dict[str, str]]:
         """Build conversation messages for LLM"""
         
+        # Select system prompt based on persona
+        if persona == "krishna":
+            base_prompt = self.krishna_prompt
+        else:
+            base_prompt = self.system_prompt
+        
         # Format RAG context
-        context_text = "\n\n".join([
-            f"Source: {r.get('metadata', {}).get('source', 'Unknown')}\n{r.get('content', '')}"
-            for r in rag_context
-        ]) if rag_context else "No specific context found in knowledge base."
+        if rag_context:
+            context_text = "\n\n".join([
+                f"Source: {r.get('metadata', {}).get('source', 'Unknown')}\n{r.get('content', '')}"
+                for r in rag_context
+            ])
+            system_content = f"{base_prompt}\n\n**Available Context from Knowledge Base:**\n{context_text}"
+        else:
+            system_content = base_prompt
         
         # Build messages
         messages = [
             {
                 "role": "system",
-                "content": f"{self.system_prompt}\n\n**Available Context from Knowledge Base:**\n{context_text}"
+                "content": system_content
             }
         ]
         
