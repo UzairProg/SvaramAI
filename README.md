@@ -10,82 +10,94 @@
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Running the API](#running-the-api)
-- [API Endpoints](#api-endpoints)
-- [Usage Examples](#usage-examples)
-- [Development](#development)
-- [Testing](#testing)
-- [Deployment](#deployment)
-- [License](#license)
+Sanskrit Chandas Identifier
+===========================
 
----
+A fully deterministic, rule-based Sanskrit Chandas (meter) identifier for Devanagari text. No machine learning, no heuristics—pure classical rules.
 
-## 🌟 Overview
+## Features
 
-SvaramAI is a comprehensive AI-powered backend system for Sanskrit language processing. It combines modern AI/ML technologies (OpenAI GPT-4o, Whisper, local embeddings, Qdrant vector database) with traditional Sanskrit scholarship to provide:
+- **Akṣara segmentation**: Handles all Devanagari conjuncts, matras, anusvāra, visarga, and virama.
+- **Laghu/Guru detection**: Implements all classical rules for syllable length.
+- **Meter matching**: Strictly matches only classical meters (Anuṣṭubh, Triṣṭubh, Jagatī, Indravajrā, Upendravajrā, Vasantatilakā, Mandākrāntā, Śārdūlavikrīḍita, Śikhariṇī, Mālinī, Pṛthvī, Aupacchandasika, Atijagatī, etc.).
+- **API**: FastAPI REST endpoint for programmatic access.
+- **Unit tests**: Deterministic, robust test suite.
 
-- **Chandas Identification**: Analyze prosody and identify Sanskrit meters with OpenAI GPT-4o + algorithmic fallback
-- **Shloka Generation**: Create authentic Sanskrit verses using OpenAI GPT-4o
-- **Branding Taglines**: Generate Sanskrit taglines for modern businesses
-- **Meaning Extraction**: Translate and analyze Sanskrit texts
-- **Knowledge Base**: RAG-powered semantic search with Qdrant and local embeddings
-- **PDF Upload**: Extract, chunk, and embed Sanskrit PDFs for semantic search
-- **Voice Karaoke**: Pronunciation analysis with OpenAI Whisper + GPT-4o feedback
+## Usage
 
----
+### 1. CLI Demo
 
-## ✨ Features
+```bash
+python chandas_identifier.py
+```
 
-### 🔍 1. Chandas Identifier - Prosody AI Engine
-- **OpenAI GPT-4o Integration** for intelligent meter detection
-- Syllable-by-syllable breakdown with Laghu/Guru classification
-- Meter identification with confidence scores
-- **Algorithmic Fallback** when LLM unavailable
-- Support for major Sanskrit meters (Anushtup, Indravajra, Upajati, etc.)
-- Handles partial verses and incomplete shlokas
+### 2. As a Library
 
-### ✍️ 2. Shloka Generator - AI Shloka Composer
-- Theme-based verse generation
-- Multiple moods (devotional, philosophical, heroic)
-- Various styles (classical, Vedic, Puranic, modern)
-- Meter-specific composition
-- English translations included
+```python
+from chandas_identifier import chandas_identify
+result = chandas_identify("धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः।\nमामकाः पाण्डवाश्चैव किमकुर्वत सञ्जय॥")
+print(result.chandas)
+print(result.pada_syllable_counts)
+```
 
-### 🎯 3. Sanskrit Tagline Generator
-- Corporate branding in Sanskrit
-- Industry-specific vocabulary
-- Multiple tone options
-- Alternative variants
-- Cultural authenticity
+### 3. REST API
 
-### 📖 4. Meaning Engine - Translation & Analysis
-- Complete English translations
-- Word-by-word breakdowns
-- Historical and cultural context
-- Grammatical analysis
-- Source identification
+```bash
+uvicorn fastapi_app:app --reload
+```
 
-### 🗄️ 5. RAG Knowledge Base
-- **Qdrant vector database** integration (localhost:6333)
-- **Local embeddings** with sentence-transformers (paraphrase-multilingual-MiniLM-L12-v2)
-- 384-dimensional vectors for semantic search
-- **PDF Upload & Processing** with automatic chunking (1000 chars, 100 overlap)
-- Multiple specialized collections (chandas_patterns, example_shlokas, grammar_rules, branding_vocab)
-- CRUD operations for documents
-- Semantic search with ranked results
-- Context retrieval for AI modules
-- Auto-recreation of collections on vector dimension mismatch
+POST to `/identify` with JSON:
 
-### 🎤 6. Voice Karaoke Analyzer - Pronunciation Coach
-- **OpenAI Whisper** speech-to-text for Sanskrit audio
-- Automatic shloka identification using RAG semantic search
-- Detailed pronunciation accuracy scoring (overall, word-level, syllable-level, meter accuracy)
-- **GPT-4o powered feedback** with specific error identification
+```json
+{"text": "धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः।\nमामकाः पाण्डवाश्चैव किमकुर्वत सञ्जय॥"}
+```
+
+## Output JSON Format
+
+```
+{
+  "chandas": "Anuṣṭubh",
+  "confidence": 1.0,
+  "pada_syllable_counts": [8,8,8,8],
+  "pada_laghu_guru": [["G","L",...], ...],
+  "pada_aksharas": [["धा","र्म","क्षे",...], ...],
+  "pada_akshara_positions": [[(start,end),...], ...],
+  "explanation": "Matched meter Anuṣṭubh by syllable count.",
+  "identification_process": ["step1",...]
+}
+```
+
+## Classical Meters Supported
+
+- Anuṣṭubh (8/8/8/8)
+- Triṣṭubh (11/11/11/11)
+- Jagatī (12/12/12/12)
+- Indravajrā (11/11/11/11 + Gana)
+- Upendravajrā (11/11/11/11)
+- Vasantatilakā (14)
+- Mandākrāntā (17)
+- Śārdūlavikrīḍita (19)
+- Śikhariṇī (17)
+- Mālinī (15)
+- Pṛthvī (11)
+- Aupacchandasika (8/12/8/12)
+- Atijagatī (13)
+
+## Akṣara Segmentation Rules
+
+- Consonant (with nukta) + optional vowel matra
+- Trailing anusvāra (ं), visarga (ः)
+- Virama + consonant cluster = one akṣara
+- Standalone vowels handled
+
+## Laghu/Guru Rules
+
+- Guru if: long vowel, anusvāra, visarga, virama, short vowel + conjunct, etc.
+- Laghu otherwise
+
+## License
+
+MIT
 - Error classification: syllable mismatch, word wrong, meter deviation
 - Personalized improvement suggestions
 - Supports: WAV, MP3, M4A, FLAC, OGG formats

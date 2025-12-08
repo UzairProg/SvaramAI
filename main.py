@@ -22,6 +22,14 @@ from routes import (
 )
 
 
+
+# Load environment variables from .env
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # If dotenv is not installed, skip (but recommend installing for local dev)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,

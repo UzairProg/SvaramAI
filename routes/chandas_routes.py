@@ -5,8 +5,10 @@ Routes for Chandas Identifier API
 from fastapi import APIRouter, HTTPException, Depends
 import logging
 
-from models import ChandasIdentifyRequest, ChandasIdentifyResponse
+from models import ChandasIdentifyRequest, ChandasIdentifyResponse, ShlokaAnalyzeRequest, ShlokaAnalyzeResponse
 from controllers import get_chandas_controller, ChandasController
+from services.chandas_service import ChandasService
+from services.llm_service import LLMService
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +40,7 @@ async def identify_chandas(
       5. Confidence calculation methodology
     """
     try:
-        result = await controller.identify_chandas(request)
+        result = await controller.identify_chandas(request.shloka)
         return result
     except Exception as e:
         logger.error(f"Chandas identification failed: {str(e)}")
@@ -46,3 +48,58 @@ async def identify_chandas(
             status_code=500,
             detail=f"Failed to identify chandas: {str(e)}"
         )
+
+
+@router.post("/chandas/analyze-shloka", response_model=ShlokaAnalyzeResponse)
+async def analyze_shloka(request: ShlokaAnalyzeRequest):
+    """
+    Analyze Sanskrit shloka using stuti-chandas library + LLM enhancement
+    
+    This endpoint uses the stuti-chandas library for accurate metre detection,
+    then enhances the analysis with OpenAI LLM for commentary and validation.
+    
+    - **verse**: Sanskrit verse text to analyze
+    
+    Returns:
+    - Detected metre name
+    - Metrical scheme and patterns
+    - Confidence score
+    - LLM-based analysis and commentary
+    """
+    try:
+        # Validate input
+        if not request.verse or not request.verse.strip():
+            raise HTTPException(status_code=422, detail="Field 'verse' is required and cannot be empty")
+        
+        # Step 1: Identify metre using stuti-chandas library
+        chandas_service = ChandasService()
+        metre_info = chandas_service.identify_metre(request.verse)
+        
+        # Step 2: Get LLM analysis
+        llm_service = LLMService()
+        llm_analysis = await llm_service.analyze_with_metre(request.verse, metre_info)
+        
+        # Step 3: Build response
+        response = ShlokaAnalyzeResponse(
+            metre=metre_info.get("metre", "Unknown"),
+            scheme=metre_info.get("scheme", ""),
+            laghu_guru_pattern=metre_info.get("laghu_guru_pattern", ""),
+            confidence=metre_info.get("confidence", 0.0),
+            syllable_count=metre_info.get("syllable_count", []),
+            gana_pattern=metre_info.get("gana_pattern", ""),
+            detected=metre_info.get("detected", False),
+            llm_output=llm_analysis
+        )
+        
+        logger.info(f"Successfully analyzed shloka: {metre_info.get('metre', 'Unknown')}")
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Shloka analysis failed: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to analyze shloka: {str(e)}"
+        )
+

@@ -22,9 +22,10 @@ class MeaningController:
         self.llm_client = get_llm_client()
         self.rag_client = get_rag_client()
         self.system_prompt = self._load_system_prompt()
+        self.kids_system_prompt = self._load_kids_system_prompt()
     
     def _load_system_prompt(self) -> str:
-        """Load meaning extraction system prompt"""
+        """Load meaning extraction system prompt for default mode"""
         try:
             with open("prompts/meaning_system.txt", 'r', encoding='utf-8') as f:
                 return f.read()
@@ -44,6 +45,30 @@ Return response as JSON with:
 - context: Historical/cultural context
 - notes: Grammatical and interpretive notes"""
     
+    def _load_kids_system_prompt(self) -> str:
+        """Load kid-friendly system prompt"""
+        try:
+            with open("prompts/meaning_kids.txt", 'r', encoding='utf-8') as f:
+                return f.read()
+        except FileNotFoundError:
+            return """You are a friendly teacher explaining Sanskrit to children (ages 8-12).
+
+Your goal is to make Sanskrit fun, simple, and relatable!
+
+Guidelines:
+- Use SIMPLE everyday words (avoid technical terms like "nominative case", "sandhi")
+- Use FUN COMPARISONS kids understand (like sharing toys, playing games, family relationships)
+- Make it ENGAGING and interesting
+- Explain concepts through STORIES or examples from daily life
+- Keep sentences SHORT and easy to understand
+- Use emojis sparingly to make it fun 🌟
+
+Return response as JSON with:
+- translation: Simple English translation with everyday words
+- word_meanings: Dictionary explaining each word like talking to a child
+- context: Fun story or relatable explanation about where this verse comes from
+- notes: Simple tips to remember or understand the verse better"""
+    
     async def extract_meaning(self, request: MeaningRequest) -> MeaningResponse:
         """
         Extract meaning and translation from Sanskrit verse
@@ -55,15 +80,36 @@ Return response as JSON with:
             MeaningResponse with translation and analysis
         """
         try:
-            logger.info(f"📖 Extracting meaning for verse")
+            logger.info(f"📖 Extracting meaning for verse (section: {request.section_name})")
             
-            # Get grammar context if needed
+            # Select system prompt based on section_name
+            system_prompt = self.kids_system_prompt if request.section_name == "kids" else self.system_prompt
+            
+            # Get grammar context if needed (simplified for kids mode)
             context = ""
             if request.include_context:
-                context = await self._get_grammar_context()
+                context = await self._get_grammar_context(is_kids_mode=(request.section_name == "kids"))
             
-            # Build user prompt
-            user_prompt = f"""Translate and analyze this Sanskrit verse:
+            # Build user prompt (adjust language for kids mode)
+            if request.section_name == "kids":
+                user_prompt = f"""Help me understand this Sanskrit verse in a fun, simple way:
+
+Verse: {request.verse}
+
+{"Tell me what each word means in simple language." if request.include_word_meanings else ""}
+{"Tell me a fun story or explain where this verse comes from." if request.include_context else ""}
+
+Remember: Explain like I'm 8 years old! Use simple words and fun examples.
+
+Provide:
+1. Simple English translation (use everyday words)
+2. What each word means (if requested) - explain like teaching a kid
+3. Fun story or context (if requested) - make it interesting!
+4. Simple tips to remember or understand this verse
+
+Return as JSON with fields: translation, word_meanings (dict), context, notes"""
+            else:
+                user_prompt = f"""Translate and analyze this Sanskrit verse:
 
 Verse: {request.verse}
 
@@ -83,15 +129,15 @@ Return as JSON with fields: translation, word_meanings (dict), context, notes"""
             
             # Get LLM response
             response_text = await self.llm_client.structured_completion(
-                system_prompt=self.system_prompt,
+                system_prompt=system_prompt,
                 user_prompt=user_prompt,
-                temperature=0.3  # Lower temperature for accuracy
+                temperature=0.3 if request.section_name == "default" else 0.5  # Higher temp for creative kids explanations
             )
             
             # Parse response
             result = self._parse_llm_response(response_text)
             
-            logger.info(f"✅ Translation completed")
+            logger.info(f"✅ Translation completed ({request.section_name} mode)")
             
             return MeaningResponse(**result)
             
@@ -99,10 +145,18 @@ Return as JSON with fields: translation, word_meanings (dict), context, notes"""
             logger.error(f"Meaning extraction failed: {str(e)}")
             raise
     
-    async def _get_grammar_context(self) -> str:
+    async def _get_grammar_context(self, is_kids_mode: bool = False) -> str:
         """Get grammar rules context"""
         try:
-            return """
+            if is_kids_mode:
+                return """
+Simple Sanskrit Tips:
+- Words can change their endings based on how they're used
+- Some words join together to make new combined words (like "rain" + "bow" = "rainbow")
+- Sanskrit has special sounds and letters
+"""
+            else:
+                return """
 Sanskrit Grammar Reference:
 - Nominal cases: 8 cases (vibhakti) - nominative to locative
 - Sandhi rules: Vowel and consonant combination rules
