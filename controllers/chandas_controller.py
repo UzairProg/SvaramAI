@@ -16,7 +16,6 @@ from utils.chandas_patterns import detect_chandas
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-
 class ChandasController:
     """Controller for chandas identification operations"""
     
