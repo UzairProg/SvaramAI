@@ -21,44 +21,6 @@ class ChandasIdentifyRequest(BaseModel):
         }
 
 
-class ShlokaAnalyzeRequest(BaseModel):
-    """Request model for shloka analysis with stuti-chandas"""
-    verse: str = Field(..., description="Sanskrit verse text to analyze")
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "verse": "धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः"
-            }
-        }
-
-
-class ShlokaAnalyzeResponse(BaseModel):
-    """Response model for shloka analysis"""
-    metre: str = Field(..., description="Identified metre name")
-    scheme: str = Field(..., description="Metrical scheme/pattern")
-    laghu_guru_pattern: str = Field(default="", description="Laghu-Guru pattern")
-    confidence: float = Field(..., description="Confidence score")
-    syllable_count: List[int] = Field(default_factory=list, description="Syllable count per pada")
-    gana_pattern: str = Field(default="", description="Gana pattern")
-    detected: bool = Field(..., description="Whether metre was successfully detected")
-    llm_output: str = Field(..., description="LLM analysis and commentary")
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "metre": "Anushtubh",
-                "scheme": "8-8-8-8",
-                "laghu_guru_pattern": "LGGLGGLG",
-                "confidence": 0.95,
-                "syllable_count": [8, 8, 8, 8],
-                "gana_pattern": "ya-ma-ta-ra",
-                "detected": True,
-                "llm_output": "This verse is in Anushtubh meter..."
-            }
-        }
-
-
 class SyllableInfo(BaseModel):
     """Information about a syllable"""
     syllable: str
@@ -126,6 +88,49 @@ class ChandasIdentifyResponse(BaseModel):
                         "result": "Confidence: 0.95 (Exact match)"
                     }
                 ]
+            }
+        }
+
+
+# ==================== SHLOKA ANALYZE MODELS ====================
+
+class ShlokaAnalyzeRequest(BaseModel):
+    """Request model for shloka analysis"""
+    verse: str = Field(..., description="Sanskrit verse text to analyze")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "verse": "वसुदेवसुतं देवं कंसचाणूरमर्दनम्"
+            }
+        }
+
+
+class ShlokaAnalyzeResponse(BaseModel):
+    """Response model for shloka analysis"""
+    metre: str = Field(..., description="Identified metre name")
+    scheme: str = Field(..., description="Metrical scheme")
+    laghu_guru_pattern: str = Field(..., description="Laghu-Guru pattern (L/G notation)")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score for detection")
+    syllable_count: List[int] = Field(default_factory=list, description="Syllable count per quarter")
+    gana_pattern: str = Field(default="", description="Gana pattern")
+    detected: bool = Field(..., description="Whether metre was successfully detected")
+    llm_output: Optional[Dict[str, Any]] = Field(default=None, description="LLM-based analysis and commentary")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "metre": "Anushtup",
+                "scheme": "8-8-8-8",
+                "laghu_guru_pattern": "LGGLGGLG LGGLGGLG LGGLGGLG LGGLGGLG",
+                "confidence": 0.95,
+                "syllable_count": [8, 8, 8, 8],
+                "gana_pattern": "ma-ya-ra-ta",
+                "detected": True,
+                "llm_output": {
+                    "explanation": "This verse follows the Anushtup metre...",
+                    "commentary": "A well-structured verse in classical Sanskrit meter"
+                }
             }
         }
 
@@ -253,26 +258,18 @@ class TaglineGenerateResponse(BaseModel):
 
 # ==================== MEANING ENGINE MODELS ====================
 
-class SectionNameEnum(str, Enum):
-    """Section mode for meaning explanations"""
-    default = "default"
-    kids = "kids"
-
-
 class MeaningRequest(BaseModel):
     """Request model for Sanskrit meaning extraction"""
     verse: str = Field(..., description="Sanskrit verse or text")
     include_word_meanings: bool = Field(True, description="Include word-by-word breakdown")
     include_context: bool = Field(True, description="Include historical/cultural context")
-    section_name: SectionNameEnum = Field(SectionNameEnum.default, description="Explanation style: 'default' for standard or 'kids' for child-friendly simplified explanations")
     
     class Config:
         json_schema_extra = {
             "example": {
                 "verse": "सत्यं ज्ञानमनन्तं ब्रह्म",
                 "include_word_meanings": True,
-                "include_context": True,
-                "section_name": "default"
+                "include_context": True
             }
         }
 

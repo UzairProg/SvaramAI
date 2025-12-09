@@ -40,7 +40,7 @@ async def identify_chandas(
       5. Confidence calculation methodology
     """
     try:
-        result = await controller.identify_chandas(request.shloka)
+        result = await controller.identify_chandas(request)
         return result
     except Exception as e:
         logger.error(f"Chandas identification failed: {str(e)}")
@@ -53,10 +53,10 @@ async def identify_chandas(
 @router.post("/chandas/analyze-shloka", response_model=ShlokaAnalyzeResponse)
 async def analyze_shloka(request: ShlokaAnalyzeRequest):
     """
-    Analyze Sanskrit shloka using stuti-chandas library + LLM enhancement
+    Analyze Sanskrit shloka for meter detection with optional LLM enhancement
     
-    This endpoint uses the stuti-chandas library for accurate metre detection,
-    then enhances the analysis with OpenAI LLM for commentary and validation.
+    This endpoint identifies the metre of a Sanskrit verse and optionally provides
+    LLM-based analysis and commentary.
     
     - **verse**: Sanskrit verse text to analyze
     
@@ -64,20 +64,24 @@ async def analyze_shloka(request: ShlokaAnalyzeRequest):
     - Detected metre name
     - Metrical scheme and patterns
     - Confidence score
-    - LLM-based analysis and commentary
+    - LLM-based analysis (if available)
     """
     try:
         # Validate input
         if not request.verse or not request.verse.strip():
             raise HTTPException(status_code=422, detail="Field 'verse' is required and cannot be empty")
         
-        # Step 1: Identify metre using stuti-chandas library
+        # Step 1: Identify metre using chandas service
         chandas_service = ChandasService()
         metre_info = chandas_service.identify_metre(request.verse)
         
-        # Step 2: Get LLM analysis
-        llm_service = LLMService()
-        llm_analysis = await llm_service.analyze_with_metre(request.verse, metre_info)
+        # Step 2: Get LLM analysis (optional)
+        llm_analysis = None
+        try:
+            llm_service = LLMService()
+            llm_analysis = await llm_service.analyze_with_metre(request.verse, metre_info)
+        except Exception as e:
+            logger.debug(f"LLM analysis not available: {e}")
         
         # Step 3: Build response
         response = ShlokaAnalyzeResponse(

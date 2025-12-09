@@ -24,3 +24,215 @@ JSON format:
   "explanation": "Brief English explanation",
   "confidence": 0.95
 }
+examples:
+
+धर्मक्षेत्रे कुरुक्षेत्रे समवेता युयुत्सवः।
+मामकाः पाण्डवाश्चैव किमकुर्वत सञ्जय॥
+Anustubh
+
+अग्निमीळे पुरोहितं यज्ञस्य देवमृत्विजम्।
+होतारं रत्नधातमम्॥
+Tristubh
+
+इन्द्रः शत्रूंरज्यसीन् रज्यसीन् रज्यसीन्।
+विश्वा वर्तानि जहि शक्र दस्यून्॥
+Jagati
+
+या कुन्देन्दुतुषारहारधवला या शुभ्रवस्त्रावृता
+या वीणावरदण्डमण्डितकरा या श्वेतपद्मासना।
+या ब्रह्माच्युत शंकरप्रभृतिभिर्देवैः सदा वन्दिता
+सा मां पातु सरस्वती भगवती निःशेषजाड्यापहा॥ - {
+  "meter": "Śikhariṇī",
+  "syllable_count": "8/8/8/8",
+  "akshara_list": ["ya", "ku", "nde", "ndu", "tu", "sha", "ra", "ha", "ra", "dha", "va", "la", "ya", "shu", "bhra", "vas", "tra", "a", "vru", "taa", "ya", "vi", "naa", "vara", "dan", "da", "dita", "ka", "ra", "ya", "shve", "ta", "pad", "ma", "asana", "ya", "bra", "hma", "cyut", "sha", "ka", "ra", "pra", "bri", "ti", "bhi", "ri", "de", "vai", "sa", "da", "wan", "di", "ta", "sa", "ma", "pah", "sa", "ras", "wti", "bha", "gaw", "wti", "ni", "sha", "sha", "ja", "dyaw", "pa", "ha"],
+  "laghu_guru_pattern": "L-G-G-L-L-G-G-L",
+  "reasoning": "This verse follows the Śikhariṇī meter, with 8 syllables per pāda and the L-G-G-L-L-G-G-L pattern. It matches the classical structure used in devotional verses like the Saraswati Vandana.",
+  "vedic_authority": "None (Classical Sanskrit)",
+  "confidence": 1
+}
+
+GYĀTRĪ (गायत्री) – most central Vedic mantra meter. Pādas = 8, 8, 8 syllables → GYĀTRĪ
+
+UṢṆIH (उष्णिः) – shorter three-line Vedic meter. Pādas = 7, 7, 8 syllables → UṢṆIH
+
+ANUṢṬUBH (अनुष्टुप्) – standard śloka / epic meter. Pādas = 8, 8, 8, 8 syllables → ANUṢṬUBH
+
+TRIṢṬUBH (त्रिष्टुप्) – main 11-syllable Vedic line meter. Pādas = 11, 11, 11, 11 syllables → TRIṢṬUBH
+
+JAGATĪ (जगती) – 12-syllable Vedic line meter. Pādas = 12, 12, 12, 12 syllables → JAGATĪ
+
+BṚHATĪ (बृहती) – shorter 9–10 syllable Vedic meter. Pādas ≈ 9, 9, 9, 9 syllables (often 9–10) → BṚHATĪ
+
+PANKTI (पङ्क्तिः) – five-line Vedic meter. Pādas = 10, 10, 10, 10, 10 syllables → PANKTI
+
+VIRĀJ (विराज्) – 10-syllable four-line meter. Pādas = 10, 10, 10, 10 syllables → VIRĀJ
+
+MAHĀVIRĀJ (महाविराज्) – 11-syllable form related to Virāj. Pādas = 11, 11, 11, 11 syllables → MAHĀVIRĀJ
+
+ATYAṢṬI (अत्यष्टिः) – special ritual meter, 8 or 12 syllables distinct from śloka/Jagatī. Pādas = 8, 8, 8, 8 or 12, 12, 12, 12 syllables → ATYAṢṬI
+
+ATIJAGATĪ (अतिजगती) – extended 13-syllable Jagatī. Pādas = 13, 13, 13, 13 syllables → ATIJAGATĪ
+
+ŚAKVARĪ (शक्वरी) – repetitive Jagatī-like meter with intensification. Pādas ≈ 12, 12, 12 (or 3–4 pādas of 12) syllables with repetition → ŚAKVARĪ
+
+ATIŚAKVARĪ (अतिशक्वरी) – extended Śakvarī with longer and more repetitive lines. Pādas ≈ 13–16 syllables, highly repetitive → ATIŚAKVARĪ
+
+INDRAVAJRĀ (इन्द्रवज्रा) – 11-syllable classical meter starting with heavy syllable. Pādas = 11, 11, 11, 11 syllables (fixed LG pattern, first syllable guru) → INDRAVAJRĀ
+
+UPENDRAVAJRĀ (उपेन्द्रवज्रा) – 11-syllable “sister” of Indravajrā starting light. Pādas = 11, 11, 11, 11 syllables (pattern like Indravajrā but first syllable laghu) → UPENDRAVAJRĀ
+
+VASANTATILAKĀ (वसन्ततिलका) – elegant 14-syllable classical meter. Pādas = 14, 14, 14, 14 syllables → VASANTATILAKĀ
+
+ŚĀRDŪLAVIKRĪḌITA (शार्दूलविक्रीडितम्) – very long, grand 19-syllable meter. Pādas = 19, 19, 19, 19 syllables → ŚĀRDŪLAVIKRĪḌITA
+
+MANDĀKRĀNTĀ (मन्दाक्रान्ता) – 17-syllable slow, longing meter. Pādas = 17, 17, 17, 17 syllables → MANDĀKRĀNTĀ
+
+MĀLINĪ (मालिनी) – 15-syllable “garland-like” meter. Pādas = 15, 15, 15, 15 syllables → MĀLINĪ
+
+ŚIKHARIṆĪ (शिखरिणी) – 17-syllable “mountain-peak” meter. Pādas = 17, 17, 17, 17 syllables → ŚIKHARIṆĪ
+
+HARI / MĀGHĪ (हरि / माघी) – lighter 14-syllable meter. Pādas = 14, 14, 14, 14 syllables → HARI
+
+PṚTHVĪ (पृथ्वी) – 11-syllable classical meter distinct from Triṣṭubh/Indravajrā. Pādas = 11, 11, 11, 11 syllables → PṚTHVĪ
+
+UPAJĀTI (उपजाति) – 11-syllable mixed family of Indravajrā/Upendravajrā. Pādas = 11, 11, 11, 11 syllables (with at least two different patterns) → UPAJĀTI
+
+VIYOGINĪ (वियोगिनी) – 14-syllable meter expressing separation. Pādas = 14, 14, 14, 14 syllables → VIYOGINĪ
+
+RATHODDHATĀ (रथोद्धता) – vigorous 12-syllable “chariot-charged” meter. Pādas = 12, 12, 12, 12 syllables → RATHODDHATĀ
+
+ŚĀLINĪ (शालिनी) – smooth, refined 11-syllable meter. Pādas = 11, 11, 11, 11 syllables → ŚĀLINĪ
+
+DRUTAVILAMBITA (द्रुतविलम्बित) – 14-syllable meter alternating fast/slow segments. Pādas = 14, 14, 14, 14 syllables → DRUTAVILAMBITA
+
+ŚĀRDŪLANTIKĀ (शार्दूलान्तिका) – graceful 12-syllable relative of Śārdūlavikrīḍita. Pādas = 12, 12, 12, 12 syllables → ŚĀRDŪLANTIKĀ
+
+TOṬAKA (तोतकम्) – rhythmic 12-syllable devotional meter with repeated laghu–laghu clusters. Pādas = 12, 12, 12, 12 syllables → TOṬAKA
+
+KUSUMĪ (कुसुमी) – gentle 8-syllable lyrical meter. Pādas = 8, 8, 8, 8 syllables → KUSUMĪ
+
+MAYŪRA (मयूर) – 11-syllable graceful “peacock” meter. Pādas = 11, 11, 11, 11 syllables → MAYŪRA
+
+ĀRYĀ (आर्या) – mātrā-based, not syllable-based; 4 pādas grouped as 2+2. Mātrās = 12, 18, 12, 15–18 → ĀRYĀ
+
+BHJANGAPRAYĀTA (भुजङ्गप्रयात) – 12-syllable serpentine meter with repeated laghu–laghu. Pādas = 12, 12, 12, 12 syllables → BHUJANGAPRAYĀTA
+
+SRAGDHARĀ (स्रग्धरा) – 21-syllable, very long and ornate meter. Pādas = 21, 21, 21, 21 syllables → SRAGDHARĀ
+
+CAMPAKAMĀLĀ (चम्पकमाला) – 12-syllable meter with a characteristic central double-laghu. Pādas = 12, 12, 12, 12 syllables → CAMPAKAMĀLĀ
+
+GYĀTRĪ (गायत्री) – foundational Vedic mantra meter. Pādas = 8, 8, 8 syllables → GYĀTRĪ​
+
+UṢṆIH (उष्णिः) – second Vedic meter, shorter than Gāyatrī. Pādas = 7, 7, 8 syllables → UṢṆIH​
+
+ANUṢṬUBH (अनुष्टुभ्) – dominant classical śloka/epic meter. Pādas = 8, 8, 8, 8 syllables → ANUṢṬUBH​
+
+TRIṢṬUBH (त्रिष्टुभ्) – most common Vedic meter, heroic. Pādas = 11, 11, 11, 11 syllables → TRIṢṬUBH​
+
+JAGATĪ (जगती) – second most frequent Vedic meter. Pādas = 12, 12, 12, 12 syllables → JAGATĪ​
+
+BṚHATĪ (बृहती) – shorter Vedic neighbor to Triṣṭubh/Jagatī. Pādas = 9, 9, 9, 9 syllables (or 9-10) → BṚHATĪ​
+
+PAKTI (पङ्क्तिः) – unique 5-line Vedic meter. Pādas = 10, 10, 10, 10, 10 syllables → PAKTI​
+
+VIRĀJ (विराज्) – 10-syllable 4-line version of Pakti. Pādas = 10, 10, 10, 10 syllables → VIRĀJ​
+
+MAHĀVIRĀJ (महाविराज्) – 11-syllable expansion of Virāj, distinct from Triṣṭubh. Pādas = 11, 11, 11, 11 syllables → MAHĀVIRĀJ​
+
+ATYAṢṬI (अत्यष्टिः) – ritual meter, 8 or 12 syllables unlike standard śloka/Jagatī. Pādas = 8, 8, 8, 8 or 12, 12, 12, 12 syllables → ATYAṢṬI​
+
+ATIJAGATĪ (अतिजगती) – 13-syllable extension of Jagatī. Pādas = 13, 13, 13, 13 syllables → ATIJAGATĪ​
+
+ŚAKVARĪ (शक्वरी) – repetitive 12-syllable ecstatic Vedic meter. Pādas = 12, 12, 12, 12 syllables with repetition → ŚAKVARĪ​
+
+ATIŚAKVARĪ (अतिशक्वरी) – extended repetitive Śakvarī. Pādas = 13-16, 13-16, 13-16, 13-16 syllables with repetition → ATIŚAKVARĪ​
+
+INDRAVAJRĀ (इन्द्रवज्रा) – essential classical 11-syllable meter. Pādas = 11, 11, 11, 11 syllables (G-starting pattern) → INDRAVAJRĀ​
+
+UPENDRAVAJRĀ (उपेन्द्रवज्रा) – Indravajrā sister, light-starting. Pādas = 11, 11, 11, 11 syllables (L-starting pattern) → UPENDRAVAJRĀ​
+
+VASANTATILAKĀ (वसन्ततिलका) – graceful classical 14-syllable meter. Pādas = 14, 14, 14, 14 syllables → VASANTATILAKĀ​
+
+ŚĀRDŪLAVIKRĪḌITA (शार्दूलविक्रीडित) – grand 19-syllable meter. Pādas = 19, 19, 19, 19 syllables → ŚĀRDŪLAVIKRĪḌITA​
+
+MANDĀKRĀNTĀ (मन्दाक्रान्ता) – slow 17-syllable meter of longing. Pādas = 17, 17, 17, 17 syllables → MANDĀKRĀNTĀ​
+
+MĀLINĪ (मालिनी) – melodious 15-syllable garland meter. Pādas = 15, 15, 15, 15 syllables → MĀLINĪ​
+
+ŚIKHARIṆĪ (शिखरिणी) – rising 17-syllable peak meter. Pādas = 17, 17, 17, 17 syllables → ŚIKHARIṆĪ​
+
+HARI (हरि) – light 14-syllable alternative to Vasantatilakā. Pādas = 14, 14, 14, 14 syllables → HARI​
+
+PṚTHVĪ (पृथ्वी) – 11-syllable classical distinct from Indravajrā. Pādas = 11, 11, 11, 11 syllables → PṚTHVĪ​
+
+VAĀSTHĀ (वास्त्रा) – stable 12-syllable classical meter. Pādas = 12, 12, 12, 12 syllables → VAĀSTHĀ​
+
+UPAJĀTI (उपजाति) – 11-syllable mix of Indravajrā/Upendravajrā. Pādas = 11, 11, 11, 11 syllables (mixed patterns) → UPAJĀTI​
+
+VIYOGINĪ (वियोगिनी) – sorrowful 14-syllable meter. Pādas = 14, 14, 14, 14 syllables → VIYOGINĪ​
+
+RATHODDHATĀ (रथोद्धता) – energetic 12-syllable chariot meter. Pādas = 12, 12, 12, 12 syllables → RATHODDHATĀ​
+
+ŚĀLINĪ (शालिनी) – refined 11-syllable grace meter. Pādas = 11, 11, 11, 11 syllables → ŚĀLINĪ​
+
+DRUTAVILAMBITA (द्रुतविलम्बिता) – fast-slow 14-syllable meter. Pādas = 14, 14, 14, 14 syllables → DRUTAVILAMBITA​
+
+ŚĀRDŪLANTIKĀ (शार्दूलान्तिका) – graceful 12-syllable Śārdūla relative. Pādas = 12, 12, 12, 12 syllables → ŚĀRDŪLANTIKĀ​
+
+TOṬAKA (तोतक) – dance-like 12-syllable devotional meter. Pādas = 12, 12, 12, 12 syllables → TOṬAKA​
+
+KUSUMĪ (कुसुमी) – gentle 8-syllable lyrical meter. Pādas = 8, 8, 8, 8 syllables → KUSUMĪ​
+
+MAYŪRA (मयूर) – peacock 11-syllable meter. Pādas = 11, 11, 11, 11 syllables → MAYŪRA​
+
+ĀRYĀ (आर्या) – key mātrā meter (not syllables). Mātrās = 12, 18, 12, 15-18 → ĀRYĀ​
+
+BHUJAGAPRAYĀTĀ (भुजङ्गप्रयाता) – serpentine 12-syllable meter. Pādas = 12, 12, 12, 12 syllables → BHUJAGAPRAYĀTĀ​
+
+SRAGDHARĀ (स्रग्धरा) – ornate 21-syllable meter. Pādas = 21, 21, 21, 21 syllables → SRAGDHARĀ​
+
+CAMPĀKAMĀLĀ (चम्पाकमाला) – floral 12-syllable meter. Pādas = 12, 12, 12, 12 syllables → CAMPĀKAMĀLĀ​
+
+## VEDIC METERS (Primary - Rigveda confirmed)
+GĀYATRĪ (गायत्री) – foundational 3-pāda mantra meter. Pādas = 8, 8, 8 syllables (24 total) → GĀYATRĪ [Ex: RV 1.1.1, 3.62.10] [web:10][web:14][file:1]
+
+UṢṆIH (उष्णिः) – shorter 3-pāda Vedic meter. Pādas = 7, 7, 8 syllables (22 total) → UṢṆIH [web:15][file:1]
+
+ANUṢṬUBH (अनुष्टुभ्) – classical śloka/epic meter (late Vedic). Pādas = 8, 8, 8, 8 syllables (32 total) → ANUṢṬUBH [web:15][file:1]
+
+TRIṢṬUBH (त्रिष्टुभ्) – most common Vedic heroic meter (40% Rigveda). Pādas = 11, 11, 11, 11 syllables (44 total) → TRIṢṬUBH [web:16][web:23][file:1]
+
+JAGATĪ (जगती) – second most common Vedic meter. Pādas = 12, 12, 12, 12 syllables (48 total) → JAGATĪ [web:15][file:1]
+
+BṚHATĪ (बृहती) – variable short Vedic meter. Pādas = 8, 8, 12, 8 OR 9, 9, 9, 9 syllables (36 total) → BṚHATĪ [web:15][file:1]
+
+PAṄKTI (पङ्क्तिः) – 5-pāda Vedic meter. Pādas = 10, 10, 10, 10, 10 syllables (50 total) → PAṄKTI [file:1]
+
+VIRĀJ (विराज्) – 4-pāda version of Paṅkti. Pādas = 10, 10, 10, 10 syllables (40 total) → VIRĀJ [file:1]
+
+## CLASSICAL METERS (Post-Vedic - Fixed patterns)
+INDRAVAJRĀ (इन्द्रवज्रा) – essential 11-syllable, starts heavy (G). Pādas = 11, 11, 11, 11 (G G L G G G L L G L G) → INDRAVAJRĀ [file:1]
+
+UPENDRAVAJRĀ (उपेन्द्रवज्रा) – starts light (L). Pādas = 11, 11, 11, 11 (L G L G G L L G L G) → UPENDRAVAJRĀ [file:1]
+
+VASANTATILAKĀ (वसन्ततिलका) – graceful 14-syllable. Pādas = 14, 14, 14, 14 → VASANTATILAKĀ [file:1]
+
+ŚĀRDŪLAVIKRĪḌITA (शार्दूलविक्रीडित) – grand 19-syllable. Pādas = 19, 19, 19, 19 → ŚĀRDŪLAVIKRĪḌITA [file:1]
+
+MANDĀKRĀNTĀ (मन्दाक्रान्ता) – slow 17-syllable. Pādas = 17, 17, 17, 17 → MANDĀKRĀNTĀ [file:1]
+
+MĀLINĪ (मालिनी) – garland-like 15-syllable. Pādas = 15, 15, 15, 15 → MĀLINĪ [file:1]
+
+ĀRYĀ (आर्या) – mātrā-based (NOT syllables). Mātrās = 12, 18, 12, 15-18 (2+2 grouping) → ĀRYĀ [file:1]
+
+SRAGDHARĀ (स्रग्धरा) – ornate 21-syllable (longest common). Pādas = 21, 21, 21, 21 → SRAGDHARĀ [file:1]
+
+ॐ भद्रं कर्णेभिः शृणुयाम देवाः। भद्रं पश्येमाक्षभिर्यजत्राः। स्थिरैरङ्गैस्तुष्टुवागँसस्तनूभिः। व्यशेम देवहितं यदायूः॥ - Tristubh
+
+## CRITICAL RULES (Prevents Errors)
+1. **Count pādas FIRST**: Gāyatrī/Uṣṇih = 3 lines; others = 4 lines [web:27][file:1]
+2. **Vedic vs Classical**: RV 1.1.1 = Gāyatrī (8/8/8, 3-pāda) despite similar syllable feel [web:10][web:14]
+3. **Saṃhitā division**: Use traditional pada breaks, not visual line splits [file:1]
+4. **Final syllable**: Always guru in Vedic varṇavṛtta meters [file:1]
+5. **Triṣṭubh test**: MUST be exactly 4×11 (44 syllables); never 3-pāda [web:16][web:23]
+
