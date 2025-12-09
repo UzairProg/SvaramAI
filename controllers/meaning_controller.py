@@ -30,18 +30,22 @@ class MeaningController:
                 return f.read()
         except FileNotFoundError:
             return """You are an expert Sanskrit scholar and translator.
-Your task is to provide accurate translations and detailed word-by-word meanings.
+Your task is to provide accurate translations, detailed word-by-word meanings, and interesting facts.
 
 Provide:
 - Complete English translation
 - Word-by-word breakdown with meanings
 - Historical and cultural context
 - Grammatical notes (case, gender, etc.)
+- Interesting and unique facts about the shloka
+- Lesser-known or obscure facts
 
 Return response as JSON with:
 - translation: Complete English translation
 - word_meanings: Dictionary of word -> meaning
 - context: Historical/cultural context
+- unique_facts: Interesting facts about the shloka
+- unknown_facts: Lesser-known or obscure facts
 - notes: Grammatical and interpretive notes"""
     
     async def extract_meaning(self, request: MeaningRequest) -> MeaningResponse:
@@ -78,8 +82,10 @@ Provide:
 2. Word-by-word breakdown (if requested)
 3. Historical/cultural context (if requested)
 4. Grammatical notes (case, sandhi, compounds, etc.)
+5. Interesting and unique facts - what makes this shloka special
+6. Unknown/obscure facts - rare interpretations, hidden meanings, scholarly insights
 
-Return as JSON with fields: translation, word_meanings (dict), context, notes"""
+Return as JSON with fields: translation, word_meanings (dict), context, unique_facts, unknown_facts, notes"""
             
             # Get LLM response
             response_text = await self.llm_client.structured_completion(
@@ -135,6 +141,8 @@ Common patterns:
             data.setdefault("translation", "")
             data.setdefault("word_meanings", {})
             data.setdefault("context", "")
+            data.setdefault("unique_facts", "")
+            data.setdefault("unknown_facts", "")
             data.setdefault("notes", "")
             
             return data
@@ -145,6 +153,8 @@ Common patterns:
                 "translation": "Unable to translate",
                 "word_meanings": {},
                 "context": "",
+                "unique_facts": "",
+                "unknown_facts": "",
                 "notes": "Translation failed"
             }
 

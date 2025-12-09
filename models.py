@@ -279,6 +279,8 @@ class MeaningResponse(BaseModel):
     translation: str = Field(..., description="Complete English translation")
     word_meanings: Dict[str, str] = Field(..., description="Word-by-word meanings")
     context: str = Field(..., description="Historical and cultural context")
+    unique_facts: str = Field(default="", description="Interesting and unique facts about the shloka")
+    unknown_facts: str = Field(default="", description="Lesser-known or obscure facts")
     notes: str = Field(..., description="Additional grammatical or interpretive notes")
     
     class Config:
@@ -292,6 +294,8 @@ class MeaningResponse(BaseModel):
                     "ब्रह्म": "Brahman, the absolute"
                 },
                 "context": "From Taittiriya Upanishad, defining the nature of Brahman",
+                "unique_facts": "This definition appears in three Taittiriya texts and forms the basis of Advaita Vedanta philosophy",
+                "unknown_facts": "Some scholars believe this formulation influenced Buddhist epistemology",
                 "notes": "All three words are in neuter gender, nominative case"
             }
         }
