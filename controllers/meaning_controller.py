@@ -9,8 +9,6 @@ from typing import Dict, Any
 from models import MeaningRequest, MeaningResponse
 from services.llm_client import get_llm_client
 from services.rag_client import get_rag_client
-from services.chandas_service import ChandasService
-from utils.chandas_cultural_info import get_chandas_info, format_chandas_context
 from config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -37,15 +35,13 @@ Your task is to provide accurate translations and detailed word-by-word meanings
 Provide:
 - Complete English translation
 - Word-by-word breakdown with meanings
-- Historical and cultural context (including chandas metre symbolism, temple architecture connections, deity associations, and spiritual significance)
+- Historical and cultural context
 - Grammatical notes (case, gender, etc.)
-
-When chandas cultural information is provided, integrate it naturally into the context section.
 
 Return response as JSON with:
 - translation: Complete English translation
 - word_meanings: Dictionary of word -> meaning
-- context: Historical/cultural context with chandas symbolism (e.g., Gayatri's 24 syllables represented in Kamakshi Temple's 24 pillars, deity associations, spiritual meanings)
+- context: Historical/cultural context
 - notes: Grammatical and interpretive notes"""
     
     async def extract_meaning(self, request: MeaningRequest) -> MeaningResponse:
@@ -61,29 +57,12 @@ Return response as JSON with:
         try:
             logger.info(f"📖 Extracting meaning for verse")
             
-            # Identify chandas metre for the verse
-            chandas_info = None
-            chandas_context = ""
-            try:
-                metre_data = ChandasService.identify_metre(request.verse)
-                if metre_data and metre_data.get('detected') and metre_data.get('metre') != 'Unknown':
-                    metre_name = metre_data.get('metre')
-                    logger.info(f"🎼 Detected metre: {metre_name}")
-                    
-                    # Get cultural information about the chandas
-                    chandas_info = get_chandas_info(metre_name)
-                    if chandas_info:
-                        chandas_context = format_chandas_context(metre_name)
-                        logger.info(f"✨ Added cultural context for {metre_name}")
-            except Exception as e:
-                logger.warning(f"Could not identify chandas: {str(e)}")
-            
             # Get grammar context if needed
             context = ""
             if request.include_context:
                 context = await self._get_grammar_context()
             
-            # Build user prompt with chandas cultural context
+            # Build user prompt
             user_prompt = f"""Translate and analyze this Sanskrit verse:
 
 Verse: {request.verse}
@@ -91,15 +70,13 @@ Verse: {request.verse}
 {"Include word-by-word meanings." if request.include_word_meanings else ""}
 {"Include historical and cultural context." if request.include_context else ""}
 
-{chandas_context if chandas_context else ""}
-
 Grammar reference:
 {context}
 
 Provide:
 1. Complete accurate English translation
 2. Word-by-word breakdown (if requested)
-3. Historical/cultural context (if requested) - MUST include the chandas metre symbolism and cultural significance provided above
+3. Historical/cultural context (if requested)
 4. Grammatical notes (case, sandhi, compounds, etc.)
 
 Return as JSON with fields: translation, word_meanings (dict), context, notes"""
